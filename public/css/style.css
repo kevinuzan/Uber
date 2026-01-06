@@ -1,0 +1,4 @@
+body { font-family: 'Inter', sans-serif; }
+.hidden { display: none !important; }
+input:focus, select:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); }
+table tbody tr:nth-child(even) { background-color: #f9fafb; }

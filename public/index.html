@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriverFinance - Lucro Real</title>
+    <link rel="manifest" href="/manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <div id="login-screen" class="fixed inset-0 bg-blue-900 flex items-center justify-center z-[100]">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full mx-4">
+            <h1 class="text-3xl font-black text-blue-600 mb-2">DriverFinance</h1>
+            <p class="text-gray-600 mb-8">Controle seu lucro real na Uber/99</p>
+            <div id="g_id_onload"
+                data-client_id="SEU_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+                data-callback="handleCredentialResponse">
+            </div>
+            <div class="g_id_signin" data-type="standard"></div>
+        </div>
+    </div>
+
+    <div id="app-content" class="hidden container mx-auto p-4 max-w-5xl">
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Olá, <span id="user-name">Motorista</span></h1>
+                <button onclick="logout()" class="text-xs text-red-500 underline">Sair da conta</button>
+            </div>
+            <div class="flex items-center bg-white p-2 rounded-lg shadow-sm border">
+                <input type="month" id="filter-period" class="outline-none text-sm font-bold text-gray-700">
+            </div>
+        </header>
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500">
+                <p class="text-gray-500 text-sm">Gastos (Gasolina/Outros)</p>
+                <h2 id="total-despesas" class="text-2xl font-bold text-red-600">R$ 0,00</h2>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-green-500">
+                <p class="text-gray-500 text-sm">Ganhos Brutos</p>
+                <h2 id="total-receitas" class="text-2xl font-bold text-green-600">R$ 0,00</h2>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
+                <p class="text-gray-500 text-sm">Lucro Líquido</p>
+                <h2 id="total-lucro" class="text-2xl font-bold text-blue-600">R$ 0,00</h2>
+            </div>
+        </section>
+
+        <section class="bg-white p-6 rounded-xl shadow-sm mb-8">
+            <form id="transaction-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <input type="text" id="desc" placeholder="Descrição (ex: Uber, Gasolina)" class="border p-2 rounded" required>
+                <input type="number" id="val" placeholder="Valor R$" step="0.01" class="border p-2 rounded" required>
+                <select id="type" class="border p-2 rounded">
+                    <option value="RECEITA">Ganho (Uber/99)</option>
+                    <option value="DESPESA">Gasto (Gasolina/Manut.)</option>
+                </select>
+                <input type="date" id="date" class="border p-2 rounded" required>
+                <button type="submit" class="md:col-span-4 bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700">Salvar Transação</button>
+            </form>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="p-4 text-xs font-bold text-gray-500 uppercase">Data</th>
+                        <th class="p-4 text-xs font-bold text-gray-500 uppercase">Descrição</th>
+                        <th class="p-4 text-xs font-bold text-gray-500 uppercase">Valor</th>
+                        <th class="p-4 text-xs font-bold text-gray-500 uppercase text-right">Saldo do Dia</th>
+                    </tr>
+                </thead>
+                <tbody id="transaction-list"></tbody>
+            </table>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
