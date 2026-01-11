@@ -8,7 +8,8 @@ import { fileURLToPath } from 'url';
 
 // --- CONFIGURAÇÕES BÁSICAS ---
 const app = express();
-const PORT = process.env.PORT || 3000;const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const PORT = process.env.PORT || 3000;
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_PUBLIC_URL });
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

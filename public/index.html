@@ -6,9 +6,13 @@
     <meta name="theme-color" content="#2563eb">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planejamento Financeiro Pessoal</title>
-    <!-- Tailwind CSS CDN -->
+    <title>DriverFinance - Gestão de Lucro Real</title>
+    
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="/css/style.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
@@ -20,12 +24,10 @@
         .summary-card {
             padding: 1rem;
             border-radius: 0.75rem;
-            /* rounded-xl */
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
             border: 1px solid;
         }
 
-        /* Estilos do Modal (Tailwind classes) */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -48,7 +50,6 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
         }
     </style>
-    <!-- Chart.js CDN (Necessário para o Gráfico de Pizza) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 </head>
 
@@ -61,19 +62,26 @@
 
             <div id="g_id_onload"
                 data-client_id="186285792472-qtg0i7f0pae52emt314u0ccamrfko8tc.apps.googleusercontent.com"
-                data-callback="handleCredentialResponse" data-auto_prompt="false">
+                data-callback="handleCredentialResponse" 
+                data-auto_prompt="false">
             </div>
-            <div class="g_id_signin" data-type="standard"></div>
+            
+            <div class="flex justify-center">
+                <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="signin_with" data-shape="rectangular" data-logo_alignment="left"></div>
+            </div>
         </div>
     </div>
 
     <div id="app-content" class="hidden container mx-auto p-4 max-w-5xl">
-        <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm">
+        <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
             <div>
-                <h1 class="text-xl font-bold">Olá, <span id="user-name">...</span></h1>
-                <button onclick="logout()" class="text-xs text-red-500 underline">Sair</button>
+                <h1 class="text-xl font-bold text-gray-800">Olá, <span id="user-name" class="text-blue-600">...</span></h1>
+                <button onclick="logout()" class="text-xs text-red-500 font-semibold underline hover:text-red-700">Sair da Conta</button>
             </div>
-            <input type="month" id="filter-period" class="border p-1 rounded font-bold text-blue-600">
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold text-gray-400 uppercase">Mês Ref:</span>
+                <input type="month" id="filter-period" class="border p-2 rounded-lg font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
         </header>
 
         <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -95,20 +103,20 @@
             class="bg-white p-6 rounded-2xl shadow-md mb-8 grid grid-cols-1 md:grid-cols-5 gap-4 border border-gray-100">
             <div class="md:col-span-2">
                 <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Descrição</label>
-                <input type="text" id="desc" placeholder="Ex: Corrida Uber"
-                    class="w-full p-3 rounded-xl bg-gray-50 border-none outline-none focus:ring-2 focus:ring-blue-500"
+                <input type="text" id="desc" placeholder="Ex: Corrida Uber Manhã"
+                    class="w-full p-3 rounded-xl bg-gray-50 border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     required>
             </div>
             <div>
                 <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Valor</label>
                 <input type="number" id="val" placeholder="0.00" step="0.01"
-                    class="w-full p-3 rounded-xl bg-gray-50 border-none outline-none focus:ring-2 focus:ring-blue-500"
+                    class="w-full p-3 rounded-xl bg-gray-50 border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     required>
             </div>
             <div>
                 <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Tipo</label>
                 <select id="type"
-                    class="w-full p-3 rounded-xl bg-gray-50 border-none outline-none focus:ring-2 focus:ring-blue-500">
+                    class="w-full p-3 rounded-xl bg-gray-50 border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all">
                     <option value="RECEITA">Ganho</option>
                     <option value="DESPESA">Gasto</option>
                 </select>
@@ -116,7 +124,7 @@
             <div>
                 <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Data</label>
                 <input type="date" id="date"
-                    class="w-full p-3 rounded-xl bg-gray-50 border-none outline-none focus:ring-2 focus:ring-blue-500"
+                    class="w-full p-3 rounded-xl bg-gray-50 border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     required>
             </div>
             <button type="submit"
@@ -125,17 +133,17 @@
             </button>
         </form>
 
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden border">
-            <table class="w-full text-left">
+        <div class="bg-white rounded-xl shadow-sm overflow-x-auto border">
+            <table class="w-full text-left min-w-[600px]">
                 <thead class="bg-gray-50 border-b">
                     <tr>
-                        <th class="p-4 text-xs font-bold text-gray-400">DATA</th>
-                        <th class="p-4 text-xs font-bold text-gray-400">DESCRIÇÃO</th>
-                        <th class="p-4 text-xs font-bold text-gray-400 text-right">VALOR</th>
-                        <th class="p-4 text-xs font-bold text-gray-400 text-right">SALDO</th>
+                        <th class="p-4 text-xs font-bold text-gray-400 uppercase">Data</th>
+                        <th class="p-4 text-xs font-bold text-gray-400 uppercase">Descrição</th>
+                        <th class="p-4 text-xs font-bold text-gray-400 uppercase text-right">Valor</th>
+                        <th class="p-4 text-xs font-bold text-gray-400 uppercase text-right">Saldo do Dia</th>
                     </tr>
                 </thead>
-                <tbody id="transaction-list"></tbody>
+                <tbody id="transaction-list" class="divide-y divide-gray-50 text-gray-700"></tbody>
             </table>
         </div>
     </div>
