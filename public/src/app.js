@@ -1,38 +1,39 @@
-let currentUser = JSON.parse(localStorage.getItem('user')) || null;
-const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000' : '';
+// Função Global para o Google
+window.handleCredentialResponse = (response) => {
+    try {
+        const payload = JSON.parse(atob(response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+        localStorage.setItem('driver_user', JSON.stringify({ id: payload.sub, name: payload.name }));
+        location.reload(); // Recarrega para iniciar o app
+    } catch (e) {
+        console.error("Erro ao decodificar login:", e);
+    }
+};
 
-// Inicialização
+const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000' : '';
+let currentUser = JSON.parse(localStorage.getItem('driver_user'));
+
 document.addEventListener('DOMContentLoaded', () => {
-    const now = new Date();
-    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    document.getElementById('filter-period').value = currentMonth;
-    
-    if (currentUser) showApp();
+    if (currentUser) {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('app-content').classList.remove('hidden');
+        document.getElementById('user-name').textContent = currentUser.name.split(' ')[0];
+
+        // Configurar data atual no filtro e no campo de data
+        const filter = document.getElementById('filter-period');
+        const d = new Date();
+        filter.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        document.getElementById('date').valueAsDate = new Date();
+
+        loadData();
+
+        // Eventos
+        filter.addEventListener('change', loadData);
+        document.getElementById('transaction-form').addEventListener('submit', saveData);
+    }
 });
 
-function handleCredentialResponse(response) {
-    const payload = JSON.parse(atob(response.credential.split('.')[1]));
-    currentUser = { id: payload.sub, name: payload.name };
-    localStorage.setItem('user', JSON.stringify(currentUser));
-    showApp();
-}
-
-function showApp() {
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('app-content').classList.remove('hidden');
-    document.getElementById('user-name').textContent = currentUser.name;
-    loadData();
-}
-
-function logout() {
-    localStorage.removeItem('user');
-    location.reload();
-}
-
 async function loadData() {
-    const period = document.getElementById('filter-period').value;
-    const [year, month] = period.split('-');
-    
+    const [year, month] = document.getElementById('filter-period').value.split('-');
     const res = await fetch(`${API_URL}/api/transactions?userId=${currentUser.id}&month=${month}&year=${year}`);
     const data = await res.json();
     render(data);
@@ -41,29 +42,24 @@ async function loadData() {
 function render(transactions) {
     const list = document.getElementById('transaction-list');
     list.innerHTML = '';
-    
-    let saldo = 0;
-    let rec = 0;
-    let desp = 0;
+    let saldo = 0, rec = 0, desp = 0;
 
     transactions.forEach(t => {
-        const val = parseFloat(t.value);
-        if (t.type === 'RECEITA') { saldo += val; rec += val; }
-        else { saldo -= val; desp += val; }
+        const v = parseFloat(t.value);
+        t.type === 'RECEITA' ? (saldo += v, rec += v) : (saldo -= v, desp += v);
 
-        const row = `
+        list.innerHTML += `
             <tr class="border-b">
-                <td class="p-4 text-sm">${new Date(t.date).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}</td>
-                <td class="p-4 text-sm font-medium">${t.description}</td>
-                <td class="p-4 text-sm ${t.type === 'RECEITA' ? 'text-green-600' : 'text-red-600'}">
-                    R$ ${val.toFixed(2)}
+                <td class="p-4 text-sm text-gray-500">${t.date.split('-').reverse().slice(0,2).join('/')}</td>
+                <td class="p-4 text-sm font-bold text-gray-700">${t.description}</td>
+                <td class="p-4 text-sm font-bold ${t.type === 'RECEITA' ? 'text-green-600' : 'text-red-600'} text-right">
+                    R$ ${v.toFixed(2)}
                 </td>
-                <td class="p-4 text-sm text-right font-bold ${saldo >= 0 ? 'text-blue-600' : 'text-orange-600'}">
+                <td class="p-4 text-sm text-right font-black ${saldo >= 0 ? 'text-blue-600' : 'text-orange-500'}">
                     R$ ${saldo.toFixed(2)}
                 </td>
             </tr>
         `;
-        list.innerHTML += row;
     });
 
     document.getElementById('total-receitas').textContent = `R$ ${rec.toFixed(2)}`;
@@ -71,9 +67,9 @@ function render(transactions) {
     document.getElementById('total-lucro').textContent = `R$ ${(rec - desp).toFixed(2)}`;
 }
 
-document.getElementById('transaction-form').onsubmit = async (e) => {
+async function saveData(e) {
     e.preventDefault();
-    const data = {
+    const payload = {
         userId: currentUser.id,
         description: document.getElementById('desc').value,
         value: document.getElementById('val').value,
@@ -84,11 +80,15 @@ document.getElementById('transaction-form').onsubmit = async (e) => {
     await fetch(`${API_URL}/api/transactions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify(payload)
     });
 
     e.target.reset();
+    document.getElementById('date').valueAsDate = new Date();
     loadData();
-};
+}
 
-document.getElementById('filter-period').onchange = loadData;
+function logout() {
+    localStorage.removeItem('driver_user');
+    location.reload();
+}

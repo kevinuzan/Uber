@@ -9,14 +9,22 @@ import { fileURLToPath } from 'url';
 // --- CONFIGURAÇÕES BÁSICAS ---
 const app = express();
 const PORT = process.env.PORT || 3000;const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_PUBLIC_URL });
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// --- MIDDLEWARES ---
+// --- MIDDLEWARES ---// Isso faz o Express servir seus arquivos HTML, CSS e JS da pasta raiz
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
+// server.mjs
+
+app.use((req, res, next) => {
+    // Esses headers resolvem o conflito com o Popup do Google
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+    res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp'); // Opcional, mas ajuda na segurança
+    next();
+});
 
 // Servir arquivos estáticos (assumindo que o index.html está na raiz)
 app.use(express.static(path.join(__dirname, 'public')));
