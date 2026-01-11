@@ -1,154 +1,101 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#2563eb">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DriverFinance - Gestão de Lucro Real</title>
+    <title>DriverFinance - Gestão de Lucro</title>
     
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    
     <link rel="stylesheet" href="/css/style.css">
+<!-- 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f4f4f5;
-        }
-
-        .summary-card {
-            padding: 1rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-            border: 1px solid;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 0.75rem;
-            max-width: 90%;
-            width: 500px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+        
+    </style> -->
 </head>
+<body>
 
-<body class="bg-gray-100 min-h-screen">
-
-    <div id="login-screen" class="fixed inset-0 bg-blue-900 flex items-center justify-center z-[100]">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full mx-4">
-            <h1 class="text-3xl font-black text-blue-600 mb-2">DriverFinance</h1>
-            <p class="text-gray-600 mb-8">Gestão de Lucro Real</p>
-
+    <div id="login-screen">
+        <div class="login-box">
+            <h1>DriverFinance</h1>
+            <p>Seu lucro real em um só lugar</p>
             <div id="g_id_onload"
                 data-client_id="186285792472-qtg0i7f0pae52emt314u0ccamrfko8tc.apps.googleusercontent.com"
                 data-callback="handleCredentialResponse" 
                 data-auto_prompt="false">
             </div>
-            
-            <div class="flex justify-center">
-                <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="signin_with" data-shape="rectangular" data-logo_alignment="left"></div>
+            <div style="display: flex; justify-content: center;">
+                <div class="g_id_signin" data-type="standard"></div>
             </div>
         </div>
     </div>
 
-    <div id="app-content" class="hidden container mx-auto p-4 max-w-5xl">
-        <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+    <div id="app-content" class="container hidden">
+        <header>
             <div>
-                <h1 class="text-xl font-bold text-gray-800">Olá, <span id="user-name" class="text-blue-600">...</span></h1>
-                <button onclick="logout()" class="text-xs text-red-500 font-semibold underline hover:text-red-700">Sair da Conta</button>
+                <h1>Olá, <span id="user-name">...</span></h1>
+                <button onclick="logout()" class="btn-logout">Sair da conta</button>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="text-[10px] font-bold text-gray-400 uppercase">Mês Ref:</span>
-                <input type="month" id="filter-period" class="border p-2 rounded-lg font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-500">
+            <div class="form-group">
+                <label>PERÍODO</label>
+                <input type="month" id="filter-period">
             </div>
         </header>
 
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="card-stat bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Ganhos Brutos</p>
-                <h2 id="total-receitas" class="text-3xl font-extrabold text-emerald-600">R$ 0,00</h2>
+        <section class="dashboard-grid">
+            <div class="card card-receita">
+                <p>Ganhos Brutos</p>
+                <h2 id="total-receitas">R$ 0,00</h2>
             </div>
-            <div class="card-stat bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Despesas Totais</p>
-                <h2 id="total-despesas" class="text-3xl font-extrabold text-rose-600">R$ 0,00</h2>
+            <div class="card card-despesa">
+                <p>Custos Totais</p>
+                <h2 id="total-despesas">R$ 0,00</h2>
             </div>
-            <div class="card-stat bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Lucro Líquido</p>
-                <h2 id="total-lucro" class="text-3xl font-extrabold text-blue-600">R$ 0,00</h2>
+            <div class="card card-lucro">
+                <p>Lucro Líquido</p>
+                <h2 id="total-lucro">R$ 0,00</h2>
             </div>
         </section>
 
-        <form id="transaction-form"
-            class="bg-white p-6 rounded-2xl shadow-md mb-8 grid grid-cols-1 md:grid-cols-5 gap-4 border border-gray-100">
-            <div class="md:col-span-2">
-                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Descrição</label>
-                <input type="text" id="desc" placeholder="Ex: Corrida Uber Manhã"
-                    class="w-full p-3 rounded-xl bg-gray-50 border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                    required>
-            </div>
-            <div>
-                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Valor</label>
-                <input type="number" id="val" placeholder="0.00" step="0.01"
-                    class="w-full p-3 rounded-xl bg-gray-50 border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                    required>
-            </div>
-            <div>
-                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Tipo</label>
-                <select id="type"
-                    class="w-full p-3 rounded-xl bg-gray-50 border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                    <option value="RECEITA">Ganho</option>
-                    <option value="DESPESA">Gasto</option>
-                </select>
-            </div>
-            <div>
-                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Data</label>
-                <input type="date" id="date"
-                    class="w-full p-3 rounded-xl bg-gray-50 border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                    required>
-            </div>
-            <button type="submit"
-                class="md:col-span-5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all transform active:scale-95 shadow-lg shadow-blue-100">
-                Confirmar Lançamento
-            </button>
-        </form>
+        <section class="form-section">
+            <form id="transaction-form" class="form-grid">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>DESCRIÇÃO</label>
+                    <input type="text" id="desc" placeholder="Ex: Corrida Uber" required>
+                </div>
+                <div class="form-group">
+                    <label>VALOR (R$)</label>
+                    <input type="number" id="val" step="0.01" placeholder="0.00" required>
+                </div>
+                <div class="form-group">
+                    <label>TIPO</label>
+                    <select id="type">
+                        <option value="RECEITA">Ganho</option>
+                        <option value="DESPESA">Gasto</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>DATA</label>
+                    <input type="date" id="date" required>
+                </div>
+                <button type="submit" class="btn-submit">Confirmar Lançamento</button>
+            </form>
+        </section>
 
-        <div class="bg-white rounded-xl shadow-sm overflow-x-auto border">
-            <table class="w-full text-left min-w-[600px]">
-                <thead class="bg-gray-50 border-b">
+        <div class="table-container">
+            <table>
+                <thead>
                     <tr>
-                        <th class="p-4 text-xs font-bold text-gray-400 uppercase">Data</th>
-                        <th class="p-4 text-xs font-bold text-gray-400 uppercase">Descrição</th>
-                        <th class="p-4 text-xs font-bold text-gray-400 uppercase text-right">Valor</th>
-                        <th class="p-4 text-xs font-bold text-gray-400 uppercase text-right">Saldo do Dia</th>
+                        <th>DATA</th>
+                        <th>DESCRIÇÃO</th>
+                        <th class="text-right">VALOR</th>
+                        <th class="text-right">SALDO DO DIA</th>
                     </tr>
                 </thead>
-                <tbody id="transaction-list" class="divide-y divide-gray-50 text-gray-700"></tbody>
+                <tbody id="transaction-list"></tbody>
             </table>
         </div>
     </div>
 
     <script src="/src/app.js"></script>
 </body>
-
 </html>
