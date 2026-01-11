@@ -47,10 +47,11 @@ function render(transactions) {
     transactions.forEach(t => {
         const v = parseFloat(t.value);
         t.type === 'RECEITA' ? (saldo += v, rec += v) : (saldo -= v, desp += v);
-
+        const date = new Date(t.date);
+        const formattedDate = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' }).format(date);
         list.innerHTML += `
             <tr class="border-b">
-                <td class="p-4 text-sm text-gray-500">${t.date.split('-').reverse().slice(0,2).join('/')}</td>
+                <td class="p-4 text-sm text-gray-500">${formattedDate}</td>
                 <td class="p-4 text-sm font-bold text-gray-700">${t.description}</td>
                 <td class="p-4 text-sm font-bold ${t.type === 'RECEITA' ? 'text-green-600' : 'text-red-600'} text-right">
                     R$ ${v.toFixed(2)}
